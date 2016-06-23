@@ -1,16 +1,16 @@
-__module_name__,__module_version__=("Apologia","0.9.0")
-__module_description__="A hexchat script for displaying and searching bible texts"
+__module_name__,__module_version__=("BOT","0.9.0")
+__module_description__="Bible bot for displaying and searching bible texts"
 print("\0034"+__module_name__+" "+__module_version__+" loaded\003")
 import collections,re,string,threading,time,xchat
 print(time.ctime()+" loading versions ... ")
 ###
 # module variables
 ###
-cmdc="!"
-fileName="./Apologia/resources/<n>.properties"
+cmdc=";"
+fileName="/home/philip/.config/hexchat/addons/Apologia/resources/<n>.properties"
 split,strip,upper=(str.split,str.strip,str.upper)
 OrderedDict,Thread=(collections.OrderedDict,threading.Thread)
-join,lower,replace=(str.join,str.lower,str.replace,)
+join,lower,replace=(str.join,str.lower,str.replace)
 bold,red,underline=("\002","\0034","\010")
 versions={}
 ###
@@ -33,6 +33,9 @@ with open(vn,"r") as versionsFile:
 # helper functions
 ###
 def displayPassage(version,book,ref,xcContext):
+	'''
+	display a passage from a selected bible in the current hexchat context.
+	'''
 	reflist=decodeRef(ref)
 	chapter=reflist[0]
 	first,last=(0,0)
@@ -61,6 +64,11 @@ def displayPassage(version,book,ref,xcContext):
 		except:
 			say("I could not find "+bold+refExpander(k)+bold,xcContext)
 def searchVersion(version,phrase,xcContext):
+	'''
+	search a bible for a phrase or for a set of words enclosed in [],(), or {}
+	(technically the enclosure need not be closed with a ],),or })
+	and display the search results in the current hexchat context.
+	'''
 	ss=""
 	verses,foundVerses=(versions[version],OrderedDict())
 	i,max=(0,20)
@@ -121,12 +129,19 @@ def searchVersion(version,phrase,xcContext):
 # utility functions
 ###
 def decodeRef(ref):
+	'''
+	decode a book, chapter, and verse (or verses) reference.
+	'''
 	s=".,:;-_"
 	b="      "
 	table=string.maketrans(s,b)
 	r=string.translate(ref,table)
 	return split(r)
 def getVersion(version):
+	'''
+	get a bible using its key (usually a three letter abbreviation) as recorded
+	in a file called "BibleVersions.properties"
+	'''
 	bv=OrderedDict()
 	bn=replace(fileName,"<n>",strip(version))
 	try:
@@ -142,6 +157,11 @@ def getVersion(version):
 		bv["error"]="I could not find version "+bold+version+bold
 		return bv
 def refExpander(ref):
+	'''
+	separate a reference into book, chapter, and verse components. 
+	book is the first 3 characters, chapter is the token before a "_",
+	and verse is the token after "_".
+	'''
 	book=ref[:3]
 	bName=bookName[book]
 	chapter=split(ref[3:],"_")[0]+":"
@@ -150,6 +170,10 @@ def refExpander(ref):
 	r = bName+" "+chapter+verse
 	return r
 def removePunctuation(s):
+	'''
+	this is redundant and I will remove it soon. 
+	removed punctuation from a string. 
+	'''
 	table=string.maketrans("","")
 	return s.translate(table,string.punctuation)
 def say(ss,xcContext):
@@ -169,6 +193,12 @@ def say(ss,xcContext):
 # callback functions
 ###
 def parseChannelMessage(word,word_eol,userdata):
+	'''
+	parses a message that starts with cmdc (command character)
+	to see if it is a command for this bot or not. If it is
+	then formulate a suitable response to the command.
+	if it isn't then ignore it.
+	'''
 	xcContext=xchat.get_context()
 	sender,message=(word[0],join(" ",split(word[1])))
 	firstchar=message[0]
