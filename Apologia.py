@@ -199,7 +199,7 @@ def parseChannelMessage(word,word_eol,userdata):
 	then formulate a suitable response to the command.
 	if it isn't then ignore it.
 	
-	I removed the threading from the bot because I tun it on 
+	I removed the threading from the bot because I run it on 
 	a netbook with limited memory and the threads can cause some 
 	memory problems the way I implemented them. 
 	'''
