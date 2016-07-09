@@ -111,7 +111,7 @@ def searchVersion(version,phrase,xcContext):
 	# send search information back to the context from which the request came
 	###
 	if i>max: 
-		say(ss+" ... more than 20found",xcContext)
+		say(ss+" ... more than 20 found",xcContext)
 		return 
 	if i==0: 
 		say("I did not find any occurence of: "
@@ -198,6 +198,10 @@ def parseChannelMessage(word,word_eol,userdata):
 	to see if it is a command for this bot or not. If it is
 	then formulate a suitable response to the command.
 	if it isn't then ignore it.
+	
+	I removed the threading from the bot because I tun it on 
+	a netbook with limited memory and the threads can cause some 
+	memory problems the way I implemented them. 
 	'''
 	xcContext=xchat.get_context()
 	sender,message=(word[0],join(" ",split(word[1])))
@@ -209,7 +213,7 @@ def parseChannelMessage(word,word_eol,userdata):
 			ss=""
 			for k in versionName:
 				ss=ss+bold+k+bold+"("+versionName[k]+") "
-			say("SAY "+ss,xcContext)
+			say(ss,xcContext)
 			return 
 		if firstpart=="help":
 			say("To display a passage type "+bold+";rsv John 3:16"+bold
@@ -228,14 +232,14 @@ def parseChannelMessage(word,word_eol,userdata):
 			version=upper(firstpart[1:])
 			if version not in versionName: return
 			phrase=lower(join(" ",cmd[1:]))
-			Thread(target=searchVersion,args=(version,phrase,xcContext)).start()
+			searchVersion(version,phrase,xcContext)
 		else:
 			if len(cmd)<3:
 				if len(cmd)==2:
 					if upper(cmd[0]) in ["CCC","CCT"]:
 						version=book=upper(cmd[0])
 						ref="1_"+removePunctuation(cmd[1])
-						Thread(target=displayPassage,args=(version,book,ref,xcContext)).start()
+						displayPassage(version,book,ref,xcContext)
 			elif len(cmd)==3: 
 				version=upper(cmd[0])
 				if version not in versionName: return
@@ -246,7 +250,7 @@ def parseChannelMessage(word,word_eol,userdata):
 				elif book in ["RUTH","RUT"]: book="RTH"
 				bref=book[:3]
 				ref=cmd[2]
-				Thread(target=displayPassage,args=(version,bref,ref,xcContext)).start()
+				displayPassage(version,bref,ref,xcContext)
 ###
 # get versions
 ###
